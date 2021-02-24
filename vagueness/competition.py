@@ -6,12 +6,14 @@ indir = 'annotations'
 odir = 'counts'
 out_word = 'ratios_by_word.tsv'
 out_source_nbr = 'ratios_by_source_nbr.tsv'
+out_meaning_nbr = 'ratios_by_meaning_nbr.tsv'
 out_pattern = 'ratios_by_pattern.tsv'
 
 if not os.path.exists(odir):
     os.makedirs(odir)
 
 by_source_nbr = {}
+by_meaning_nbr = {}
 by_derivation_pattern = {}
 with open(out_word, mode='w') as out_all:
     # collect annotation counts per word and compute ratios
@@ -46,6 +48,10 @@ with open(out_word, mode='w') as out_all:
         by_source_nbr.setdefault(number_of_sources, {"alpha": [], "beta": []})
         by_source_nbr[number_of_sources]["alpha"].append(alpha)
         by_source_nbr[number_of_sources]["beta"].append(beta)
+        #collect values by number of meanings
+        by_meaning_nbr.setdefault(nbcol, {"alpha": [], "beta": []})
+        by_meaning_nbr[nbcol]["alpha"].append(alpha)
+        by_meaning_nbr[nbcol]["beta"].append(beta)
         #collect values by derivation pattern
         by_derivation_pattern.setdefault(derivation_pattern, {"alpha": [], "beta": []})
         by_derivation_pattern[derivation_pattern]["alpha"].append(alpha)
@@ -53,6 +59,12 @@ with open(out_word, mode='w') as out_all:
 
 with open(out_source_nbr, mode='w') as averages:
     for nbr, vals in sorted(by_source_nbr.items()):
+        vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
+        vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
+        averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
+
+with open(out_meaning_nbr, mode='w') as averages:
+    for nbr, vals in sorted(by_meaning_nbr.items()):
         vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
         vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
         averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
