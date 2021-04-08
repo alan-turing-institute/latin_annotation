@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-inputf = pd.read_csv('competition_by_word_chron.tsv', sep="\t", header=None)
+inputf = pd.read_csv('rations_by_word_chron.tsv', sep="\t", header=None)
 columns = []
 for column in inputf:
     columns.append(inputf[column].tolist())
@@ -39,4 +40,10 @@ plt.xticks([pos + bar_width for pos in range(len(pos1))], words,rotation=60)
 #legend
 plt.legend(loc='upper left')
 
+
+outdir = 'charts'
+fname = os.path.join(outdir, 'chronology.png')
+plt.savefig(fname, dpi=500, facecolor='w', edgecolor='w',
+        orientation='portrait', format='png',
+        transparent=False, bbox_inches=None, pad_inches=0.1, metadata=None)
 plt.show()

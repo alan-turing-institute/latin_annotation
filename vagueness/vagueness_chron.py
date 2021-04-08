@@ -3,7 +3,7 @@ import os
 import sys
 
 indir = 'annotations_meta'
-out_word_chron = 'competition_by_word_chron.tsv'
+out_word_chron = 'ratios_by_word_chron.tsv'
 
 with open(out_word_chron, mode='w') as out_all:
     # collect annotation counts per word and compute ratios

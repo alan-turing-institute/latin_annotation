@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 inputf = pd.read_csv('ratios_by_word.tsv', sep="\t", header=None)
 columns = []
@@ -14,8 +15,8 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 
 #definition of both series
-ax1.scatter(words, alpha, c="blue", label="alpha")
-ax1.scatter(words, beta, c="red", label="beta")
+ax1.scatter(words, alpha, c="rebeccapurple")
+#ax1.scatter(words, beta, c="red", label="beta")
 
 #grid lines
 ax1.xaxis.grid(True, linestyle=':')
@@ -24,7 +25,7 @@ yminor = 0.2
 ax1.axhline(ymajor, color="black")
 ax1.axhline(yminor, linestyle=':', color="black")
 
-ax1.set_title('Sense identification by word')
+ax1.set_title('Vagueness by word')
 ax1.set_xlabel('Word')
 ax1.set_ylabel('Score')
 
@@ -32,6 +33,12 @@ ax1.set_ylabel('Score')
 plt.xticks(rotation=60)
 
 #legend
-plt.legend(loc='upper left')
+#plt.legend(loc='upper left')
+
+outdir = 'charts'
+fname = os.path.join(outdir, 'overview.png')
+plt.savefig(fname, dpi=500, facecolor='w', edgecolor='w',
+        orientation='portrait', format='png',
+        transparent=False, bbox_inches=None, pad_inches=0.1, metadata=None)
 
 plt.show()

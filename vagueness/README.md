@@ -1,17 +1,20 @@
 # Vagueness score
 
-## What can you find in this folder
+## Contents of this folder
 
 ### Folders
-The annotations - kept here so the code can be run easily -- ask Barbara and Daria about their input
+- `annotations_meta`: TSV file with the annotation of each lemma. The header contains
+  the derivation pattern. The first column shows the era of each annotation context (BC/CE).
+- `counts`: ancillary folder created with `vagueness.py` that has the number of annotations type (0, 1, 2, 3, 4) by word.
+- `charts`: plots in PNG format
 
 ### Code
 
-- `competition.py` is the code that generated most of the results
-
-
-- Everything else: charts
+- `vagueness.py` is the code that generated most of the results
+- `vagueness_chron.py` gets the metadata referred to the periods
+- `central_tendencies.py` calculates average, mean, etc.
+- `charts.ipnyb` notebook that generates the plots
 
 ### Results
 
-- `.tsv` the results of the score
+- `.tsv` the results with the scores (inputs to generate the plots)
