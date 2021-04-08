@@ -29,7 +29,7 @@ ax.xaxis.grid(True, linestyle=':')
 ymajor = 0.0
 ax.axhline(ymajor, color="black")
 
-ax.set_title('Competition by word (BC / AD)')
+ax.set_title('Vagueness by word (BC / AD)')
 ax.set_xlabel('Word')
 ax.set_ylabel('Score')
 
