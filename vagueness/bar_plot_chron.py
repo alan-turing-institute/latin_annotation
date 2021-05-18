@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-inputf = pd.read_csv('rations_by_word_chron.tsv', sep="\t", header=None)
+inputf = pd.read_csv('ratios_by_word_chron.tsv', sep="\t", header=None)
 columns = []
 for column in inputf:
     columns.append(inputf[column].tolist())
@@ -21,8 +21,8 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 #definition of both series
-plt.bar(pos1, bc, color="rebeccapurple", label="BC", width = bar_width)
-plt.bar(pos2, ad, color="plum", label="AD", width = bar_width)
+plt.bar(pos1, bc, color="rebeccapurple", label="BCE", width = bar_width)
+plt.bar(pos2, ad, color="plum", label="CE", width = bar_width)
 
 
 #grid lines
@@ -30,7 +30,7 @@ ax.xaxis.grid(True, linestyle=':')
 ymajor = 0.0
 ax.axhline(ymajor, color="black")
 
-ax.set_title('Vagueness by word (BC / AD)')
+ax.set_title('Vagueness by word (BCE / CE)')
 ax.set_xlabel('Word')
 ax.set_ylabel('Score')
 
