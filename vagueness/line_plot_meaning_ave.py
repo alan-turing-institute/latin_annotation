@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-inputf = pd.read_csv('ratios_by_meaning_nbr.tsv', sep="\t", header=None)
+inputf = pd.read_csv('ratios_by_meaning_nbr_ave.tsv', sep="\t", header=None)
 columns = []
 for column in inputf:
     columns.append(inputf[column].tolist())

@@ -3,11 +3,11 @@ import os
 import sys
 import statistics
 
-indir = 'annotations_meta'
+indir = 'annotations'
 odir = 'counts'
 out_word = 'ratios_by_word.tsv'
 out_source_nbr = 'ratios_by_source_nbr.tsv'
-out_meaning_nbr = 'ratios_by_meaning_nbr.tsv'
+out_meaning_nbr_ave = 'ratios_by_meaning_nbr_ave.tsv'
 out_meaning_nbr_med = 'ratios_by_meaning_nbr_median.tsv'
 out_pattern = 'ratios_by_pattern.tsv'
 
@@ -74,7 +74,7 @@ with open(out_source_nbr, mode='w') as averages:
         vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
         averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
 
-with open(out_meaning_nbr, mode='w') as averages:
+with open(out_meaning_nbr_ave, mode='w') as averages:
     for nbr, vals in sorted(by_meaning_nbr.items()):
         vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
         vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
