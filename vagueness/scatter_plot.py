@@ -21,7 +21,7 @@ ax1.scatter(words, alpha, c="rebeccapurple")
 #grid lines
 ax1.xaxis.grid(True, linestyle=':')
 ymajor = 0.0
-yminor = 0.2
+yminor = 0.11
 ax1.axhline(ymajor, color="black")
 ax1.axhline(yminor, linestyle=':', color="black")
 

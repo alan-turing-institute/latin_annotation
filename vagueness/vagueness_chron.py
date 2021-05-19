@@ -29,6 +29,8 @@ with open(out_word_chron, mode='w') as out_all:
             else:
                 print(f"error: {fn}")
         comp_bc = (file_counts_bc[4] + file_counts_bc[3]) / (nbmeanings * nblines_bc) - 1 / nbmeanings
+        comp_bc = comp_bc / (1 - 1 / nbmeanings)
         comp_ad = (file_counts_ad[4] + file_counts_ad[3]) / (nbmeanings * nblines_ad) - 1 / nbmeanings
+        comp_ad = comp_ad / (1 - 1 / nbmeanings)
         # print bc/ad value of “alpha” (competition) by word
         out_all.write(f"{word}\t{comp_bc:.3f}\t{comp_ad:.3f}\n")

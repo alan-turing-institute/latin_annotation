@@ -1,12 +1,14 @@
 from collections import Counter
 import os
 import sys
+import statistics
 
 indir = 'annotations_meta'
 odir = 'counts'
 out_word = 'ratios_by_word.tsv'
 out_source_nbr = 'ratios_by_source_nbr.tsv'
 out_meaning_nbr = 'ratios_by_meaning_nbr.tsv'
+out_meaning_nbr_med = 'ratios_by_meaning_nbr_median.tsv'
 out_pattern = 'ratios_by_pattern.tsv'
 
 if not os.path.exists(odir):
@@ -48,6 +50,7 @@ with open(out_word, mode='w') as out_all:
             file_counts = Counter(file_annots)
         #alpha is the vagueness score
         alpha = (file_counts[3] + file_counts[4]) / (nbmeanings * nblines) - 1 / nbmeanings
+        alpha = alpha / (1 - 1 / nbmeanings)
         #beta could be used to alert of the presence of 0
         beta = (file_counts[1] + file_counts[2]) / (nbmeanings * nblines) - (nbmeanings - 1) / nbmeanings
         #print output by word
@@ -76,6 +79,12 @@ with open(out_meaning_nbr, mode='w') as averages:
         vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
         vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
         averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
+
+with open(out_meaning_nbr_med, mode='w') as medians:
+    for nbr, vals in sorted(by_meaning_nbr.items()):
+        vals["alpha_med"] = statistics.median(vals["alpha"])
+        vals["beta_med"] = statistics.median(vals["beta"])
+        medians.write(f"{nbr}\t{vals['alpha_med']:.3f}\t{vals['beta_med']:.3f}\n")
 
 with open(out_pattern, mode='w') as averages:
     for pattern, vals in sorted(by_derivation_pattern.items()):
