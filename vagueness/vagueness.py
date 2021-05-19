@@ -51,43 +51,34 @@ with open(out_word, mode='w') as out_all:
         #alpha is the vagueness score
         alpha = (file_counts[3] + file_counts[4]) / (nbmeanings * nblines) - 1 / nbmeanings
         alpha = alpha / (1 - 1 / nbmeanings)
-        #beta could be used to alert of the presence of 0
-        beta = (file_counts[1] + file_counts[2]) / (nbmeanings * nblines) - (nbmeanings - 1) / nbmeanings
         #print output by word
-        out_all.write(f"{word}\t{alpha:.3f}\t{beta:.3f}\n")
+        out_all.write(f"{word}\t{alpha:.3f}\n")
         #collect values by number of sources
-        by_source_nbr.setdefault(number_of_sources, {"alpha": [], "beta": []})
+        by_source_nbr.setdefault(number_of_sources, {"alpha": []})
         by_source_nbr[number_of_sources]["alpha"].append(alpha)
-        by_source_nbr[number_of_sources]["beta"].append(beta)
         #collect values by number of meanings
-        by_meaning_nbr.setdefault(nbmeanings, {"alpha": [], "beta": []})
+        by_meaning_nbr.setdefault(nbmeanings, {"alpha": []})
         by_meaning_nbr[nbmeanings]["alpha"].append(alpha)
-        by_meaning_nbr[nbmeanings]["beta"].append(beta)
         #collect values by derivation pattern
-        by_derivation_pattern.setdefault(derivation_pattern, {"alpha": [], "beta": []})
+        by_derivation_pattern.setdefault(derivation_pattern, {"alpha": []})
         by_derivation_pattern[derivation_pattern]["alpha"].append(alpha)
-        by_derivation_pattern[derivation_pattern]["beta"].append(beta)
 
 with open(out_source_nbr, mode='w') as averages:
     for nbr, vals in sorted(by_source_nbr.items()):
         vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
-        vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
-        averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
+        averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\n")
 
 with open(out_meaning_nbr_ave, mode='w') as averages:
     for nbr, vals in sorted(by_meaning_nbr.items()):
         vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
-        vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
-        averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
+        averages.write(f"{nbr}\t{vals['alpha_ave']:.3f}\n")
 
 with open(out_meaning_nbr_med, mode='w') as medians:
     for nbr, vals in sorted(by_meaning_nbr.items()):
         vals["alpha_med"] = statistics.median(vals["alpha"])
-        vals["beta_med"] = statistics.median(vals["beta"])
-        medians.write(f"{nbr}\t{vals['alpha_med']:.3f}\t{vals['beta_med']:.3f}\n")
+        medians.write(f"{nbr}\t{vals['alpha_med']:.3f}\n")
 
 with open(out_pattern, mode='w') as averages:
     for pattern, vals in sorted(by_derivation_pattern.items()):
         vals["alpha_ave"] = sum(vals["alpha"])/len(vals["alpha"])
-        vals["beta_ave"] = sum(vals["beta"])/len(vals["alpha"])
-        averages.write(f"{pattern}\t{vals['alpha_ave']:.3f}\t{vals['beta_ave']:.3f}\n")
+        averages.write(f"{pattern}\t{vals['alpha_ave']:.3f}\n")

@@ -2,7 +2,7 @@ from collections import Counter
 import os
 import sys
 
-indir = 'annotations_meta'
+indir = 'annotations'
 out_word_chron = 'ratios_by_word_chron.tsv'
 
 with open(out_word_chron, mode='w') as out_all:
@@ -32,5 +32,5 @@ with open(out_word_chron, mode='w') as out_all:
         comp_bc = comp_bc / (1 - 1 / nbmeanings)
         comp_ad = (file_counts_ad[4] + file_counts_ad[3]) / (nbmeanings * nblines_ad) - 1 / nbmeanings
         comp_ad = comp_ad / (1 - 1 / nbmeanings)
-        # print bc/ad value of “alpha” (competition) by word
+        # print bc/ad value of “alpha” (vagueness) by word
         out_all.write(f"{word}\t{comp_bc:.3f}\t{comp_ad:.3f}\n")
