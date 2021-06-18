@@ -25,6 +25,8 @@ import re
 from collections import Counter
 import locale
 from pandas import read_excel
+import pandas as pd
+import xlrd
 import numpy as np
 import math
 from statistics import mean
@@ -85,8 +87,12 @@ annotator2ratings = dict() # maps an annotator to the data frame of their rating
 
 for annotator in annotators:
     my_sheet = 'Annotation'
-    ann = read_excel(os.path.join(dir_annotation, "Annotation_task1_virtus_" + annotator + ".xlsx"),
-                              sheet_name=my_sheet, encoding='utf-8')
+    #ann = read_excel(os.path.join(dir_annotation, "Annotation_task1_virtus_" + annotator + ".xlsx"), sheet_name=my_sheet, encoding='utf-8')
+    ann = read_excel(os.path.join(dir_annotation, "Annotation_task1_virtus_" + annotator + ".xlsx"), sheet_name=my_sheet)
+    #wb = xlrd.open_workbook(os.path.join(dir_annotation, "Annotation_task1_virtus_" + annotator + ".xlsx"),
+    # encoding_override='utf-8')
+    #wb_sheet = wb.sheet_by_name(my_sheet)
+    #ann = pd.read_excel(wb_sheet)
     print("Annotator:" + annotator)
     print(str(ann.shape[0]), "rows", ann.shape[1], "columns")
 
@@ -95,6 +101,7 @@ for annotator in annotators:
 
 # Calculate correlation coefficients:
 
+all_rhos = list()
 for annotator1 in annotators:
     for annotator2 in annotators:
         if annotator1 < annotator2:
@@ -126,8 +133,12 @@ for annotator1 in annotators:
 
             #print(str(rhos))
             rhos_sign = [rho for rho in rhos if rho != "non-sign" and not math.isnan(rho) ]
-            print(str(round(mean(rhos_sign),2)))
-            output.write("Mean of Spearman rho betweeen "+ annotator1 + " and " + annotator2 + ": " + str(round(mean(rhos_sign),2)) + "\n")
+            mean_rho_ann = mean(rhos_sign)
+            print(str(round(mean_rho_ann,2)))
+            print(str(all_rhos))
+            all_rhos.append(mean_rho_ann)
+            print(str(all_rhos))
+            output.write("Mean of Spearman rho betweeen "+ annotator1 + " and " + annotator2 + ": " + str(round(mean_rho_ann,2)) + "\n")
 
-
+output.write("Mean pairwise Spearman rho :" + str(round(mean(all_rhos),2)) + "\n")
 output.close()
