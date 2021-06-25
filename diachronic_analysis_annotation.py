@@ -31,7 +31,7 @@ from statsmodels.graphics.gofplots import qqplot
 #from matplotlib import pyplot
 from statistics import mean
 import matplotlib.pyplot as pl
-
+from scipy.stats import wilcoxon
 
 now = datetime.datetime.now()
 today_date = str(now)[:10]
@@ -132,7 +132,8 @@ output_writer.writerow(['Target', 'average new senses AD', 'average old senses B
                         'average new senses BC', 'average new senses AD + old senses BC', 'average old senses AD + new senses BC',
                         'average new senses AD + average old senses BC > average old senses AD + average new senses BC?', 'difference',
                         "Shapiro test", "p-value of Shapiro test", "Is the distribution normal?", "t-test statistic",
-                        "t-test p-value", "Is new senses AD + old senses BC significantly greater than old senses AD + new senses BC?"])
+                        "t-test p-value", "Is new senses AD + old senses BC significantly greater than old senses AD + new senses BC? (t-test)", "statistic of Wilcoxon test", "p-value of Wilcoxon test",
+                        "Is new senses AD + old senses BC significantly greater than old senses AD + new senses BC? (Wilcoxon test)" ])
 
 
 # Read annotated data:
@@ -263,7 +264,7 @@ for target in targets:
     #             str(av_news_ad+av_olds_bc)+ "\t"+ "old senses AD + new senses BC:"+ str(av_olds_ad+av_news_bc)+ "\t"+
     #             "new senses AD + old senses BC > old senses AD + new senses BC? "+ "\t"+ hypothesis_true+"difference:"+str((av_news_ad+av_olds_bc)-(av_olds_ad+av_news_bc))+"\t")
 
-    # Paired one-tailed t-test to test either if the mean of all_ratings_new_senses_ad+all_ratings_old_senses_bc is significantly greater than x all_ratings_old_senses_ad+all_ratings_new_senses_bc
+    # Paired one-tailed t-test to test whether the mean of all_ratings_new_senses_ad+all_ratings_old_senses_bc is significantly greater than all_ratings_old_senses_ad+all_ratings_new_senses_bc
     # Assumptions:
     # 1) Differences between the two dependent variables follows an approximately normal distribution (Shapiro-Wilks Test);
     # 2) Independent variable should have a pair of dependent variables; ???
@@ -275,6 +276,8 @@ for target in targets:
     print("all_ratings_old_senses_ad+all_ratings_new_senses_bc:"+str(all_ratings_old_senses_ad+all_ratings_new_senses_bc))
     a = all_ratings_new_senses_ad+all_ratings_old_senses_bc
     b = all_ratings_old_senses_ad+all_ratings_new_senses_bc
+    #a = [math.log(x+0.00000001) for x in a]
+    #b = [math.log(x+0.00000001) for x in b]
     x = np.array(a)-np.array(b)
     #print(str(x))
     # Shapiro-Wilks test to test that the difference between the two distributions is normally distributed:
@@ -309,10 +312,24 @@ for target in targets:
     #print("t = " + str(t))
     #print("p = " + str(p))
     #output.write("t = " + str(t), "p = " + str(p))
+    # NB: the t-test can't be used because the distributions aren't normal.
+
+    # Wilcoxon signed-rank test:
+    # The assumption made for the Wilcoxon test is that the variable being tested is symmetrically distributed about the median, which would also be the mean.
+    # Remember too that it is still vitally important that your sample has been randomly chosen from the population.
+    # Data are paired and come from the same population.
+    # Each pair is chosen randomly and independently[
+    # The data are measured on at least an interval scale; if does suffice that within-pair comparison are on an ordinal scale
+    w, p = wilcoxon(a,b, alternative='greater')
+    is_greater_w = ""
+    if p > alpha:
+        is_greater_w = "no"
+    else:
+        is_greater_w = "yes"
 
     # write to output file:
     output_writer.writerow(
         [target, av_news_ad, av_olds_bc, av_olds_ad, av_news_bc, av_news_ad + av_olds_bc, av_olds_ad + av_news_bc,
-         hypothesis_true, (av_news_ad + av_olds_bc) - (av_olds_ad + av_news_bc), shapiro_test.statistic, shapiro_test.pvalue, is_normal, t, p, is_greater])
+         hypothesis_true, (av_news_ad + av_olds_bc) - (av_olds_ad + av_news_bc), shapiro_test.statistic, shapiro_test.pvalue, is_normal, t, p, is_greater, w, p, is_greater_w])
 
 output.close()
