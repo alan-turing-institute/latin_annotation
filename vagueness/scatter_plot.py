@@ -19,9 +19,9 @@ ax1.scatter(words, alpha, c="rebeccapurple")
 #grid lines
 ax1.xaxis.grid(True, linestyle=':')
 ymajor = 0.0
-yminor = 0.11
+#yminor = 0.1
 ax1.axhline(ymajor, color="black")
-ax1.axhline(yminor, linestyle=':', color="black")
+#ax1.axhline(yminor, linestyle=':', color="black")
 
 ax1.set_title('Vagueness by word')
 ax1.set_xlabel('Word')
