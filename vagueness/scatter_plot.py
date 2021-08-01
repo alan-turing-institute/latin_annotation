@@ -8,15 +8,13 @@ for column in inputf:
     columns.append(inputf[column].tolist())
 words = columns[0]
 alpha = columns[1]
-beta = columns[2]
 
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 
-#definition of both series
+#series definition
 ax1.scatter(words, alpha, c="rebeccapurple")
-#ax1.scatter(words, beta, c="red", label="beta")
 
 #grid lines
 ax1.xaxis.grid(True, linestyle=':')

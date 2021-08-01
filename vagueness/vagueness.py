@@ -4,15 +4,12 @@ import sys
 import statistics
 
 indir = 'annotations'
-odir = 'counts'
 out_word = 'ratios_by_word.tsv'
 out_source_nbr = 'ratios_by_source_nbr.tsv'
 out_meaning_nbr_ave = 'ratios_by_meaning_nbr_ave.tsv'
 out_meaning_nbr_med = 'ratios_by_meaning_nbr_median.tsv'
 out_pattern = 'ratios_by_pattern.tsv'
 
-if not os.path.exists(odir):
-    os.makedirs(odir)
 
 by_source_nbr = {}
 by_meaning_nbr = {}

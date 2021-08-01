@@ -42,7 +42,7 @@ plt.legend(loc='upper left')
 
 
 outdir = 'charts'
-fname = os.path.join(outdir, 'chronology.png')
+fname = os.path.join(outdir, 'overview_chronologic.png')
 plt.savefig(fname, dpi=500, facecolor='w', edgecolor='w',
         orientation='portrait', format='png',
         transparent=False, bbox_inches=None, pad_inches=0.1, metadata=None)

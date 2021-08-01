@@ -5,7 +5,6 @@
 ### Folders
 - `annotations`: TSV file with the annotation of each lemma. The header contains
   the derivation pattern. The first column shows the era of each annotation context (BC/CE).
-- `counts`: ancillary folder created with `vagueness.py` that has the number of annotations type (0, 1, 2, 3, 4) by word.
 - `charts`: plots in PNG format
 
 ### Code
