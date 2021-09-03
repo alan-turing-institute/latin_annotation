@@ -120,9 +120,26 @@ for annotator1 in annotators:
             for row_n in range(ratings1.shape[0]):
                 #print("Row:", str(row_n))
                 try:
-                    rho, pval = spearmanr(ratings1.iloc[row_n,], ratings2.iloc[row_n,])
-                    if pval >= 0.05:
-                        rho = 'non-sign'
+                    r1 = ratings1.iloc[row_n,]
+                    r2 = ratings2.iloc[row_n,]
+                    r1 = r1.astype(float)
+                    r2 = r2.astype(float)
+                    # I replace zeros with Nas:
+                    #print(str(type(r1)))
+                    #print(str(type(r2)))
+                    r1.replace(0, np.nan, inplace = True)
+                    r2.replace(0, np.nan, inplace = True)
+                    #print("r1", str(r1))
+                    #print("r2", str(r2))
+
+                    if r1.isnull().values.any() or r2.isnull().values.any():
+                        print("NAs!")
+                    else:
+                        rho, pval = spearmanr(r1, r2)
+                        print("rho, pval", str(rho), str(pval))
+
+                    #if pval >= 0.05:
+                    #    rho = 'non-sign'
                     rhos.append(rho)
                     pvalues.append(pval)
                 except:

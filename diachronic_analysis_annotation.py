@@ -51,7 +51,7 @@ if istest == "":
 
 directory = os.path.join("/Users", "bmcgillivray", "Documents", "OneDrive", "The Alan Turing Institute", "OneDrive - The Alan Turing Institute", "Research", "2019", "Latin corpus")
 dir_annotation = os.path.join(directory, "Semantic annotation", "annotated data")
-dir_output = os.path.join(directory, "Semantic annotation", "Semantic_change_analysis")
+dir_output = os.path.join("/Users", "bmcgillivray", "Documents", "OneDrive", "The Alan Turing Institute", "OneDrive - The Alan Turing Institute", "Research", "2021", "Latin annotation", "Semantic_change_analysis")
 
 # Output file:
 output_file_name = "Semantic_change_analysis.csv"
