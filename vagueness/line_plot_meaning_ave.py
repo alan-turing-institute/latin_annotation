@@ -12,7 +12,7 @@ source = map(str, source)
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-ax.set_title('Vagueness by number of meanings (average)')
+ax.set_title('Vagueness by number of meanings (mean)')
 ax.set_xlabel('Number of meanings')
 ax.set_ylabel('Vagueness score')
 
