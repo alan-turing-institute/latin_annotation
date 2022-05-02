@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 __author__ = 'dareia'
 
 
-# In[9]:
+# In[ ]:
 
 
 import os
@@ -18,7 +18,7 @@ pd.options.display.max_colwidth = 100
 import re
 import pprint
 pp = pprint.PrettyPrinter()
-directory = os.path.join("..", "..", "Annotated data")
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import ast
 import itertools
@@ -30,15 +30,16 @@ from sklearn import metrics
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[10]:
+# In[ ]:
 
 
+mpl.rcParams['figure.dpi']= 500
+mpl.rc("savefig", dpi=500)
 plt.rcParams['figure.figsize'] = [7, 20]
-
 patterns = ["|", "\\", "/", "+", "-", ".", "*", "x", "o", "O"]
 
 
-# In[45]:
+# In[ ]:
 
 
 from adjustText import adjust_text
@@ -56,17 +57,19 @@ def plot_scatter(df, x_values, y_values, labels, filename=None, a=0.4, c='blue',
                 #arrowprops=dict(arrowstyle="->", color='r', lw=0.5))
     if filename == None:
         filename = 'confidence analysis/{value1}_and_{value2}_scatter.png'.format(value1=y_values, value2=x_values)
-    plt.savefig(filename, bbox_inches='tight')
+    plt.savefig(filename, bbox_inches='tight',
+                #transparent=True
+               )
 
 
-# In[12]:
+# In[ ]:
 
 
 def printsep(s):
     print(s*30)
 
 
-# In[13]:
+# In[ ]:
 
 
 def normalize_ratings(ratings):
@@ -84,7 +87,7 @@ def normalize_ratings(ratings):
     return ratings
 
 
-# In[14]:
+# In[ ]:
 
 
 def annotator_probability(maxmeanings, probs):
@@ -106,24 +109,30 @@ def annotator_probability(maxmeanings, probs):
 
 # # Reading data from spreadsheets (.xslx)
 
-# In[15]:
+# In[ ]:
+
+
+directory = os.path.join("..", "..", "Annotated data")
+
+
+# In[ ]:
 
 
 paths = [f for f in os.listdir(directory) if f[-5:]=='.xlsx' and f[0]!='~']
 print(paths)
 
 
-# In[16]:
+# In[ ]:
 
 
 spreadsheets = []
 single_words = {}
 
 
-# In[17]:
+# In[ ]:
 
 
-# This cell is to run the loop on one file.
+# This cell runs the loop on one file.
 for path in paths:
     printsep('-|-|')
     print('Working with the file ' + path)
@@ -143,9 +152,9 @@ for path in paths:
     column_headings = list(df.columns)
     print(column_headings)
     try:
-        x = column_headings.index('right context')+1 #where metadata and test sentence ends
-        y = column_headings.index('comments') #the last column (also checks whether it is "comments")
-        meanings = [m.replace('\xa0', ' ') for m in column_headings[x:y]] #dealing with the \xa0 character
+        x = column_headings.index('right context')+1 # where metadata and test sentence ends
+        y = column_headings.index('comments') # the last column (also checks whether it is "comments")
+        meanings = [m.replace('\xa0', ' ') for m in column_headings[x:y]] # dealing with the \xa0 character
     except ValueError:
         print("No such columns in the spreadsheet.")
         meanings = []
@@ -275,14 +284,13 @@ for path in paths:
     plt.close()
 
 
-# In[18]:
+# In[ ]:
 
 
 len(spreadsheets) # should be 39
-#spreadsheets = ... # fixes things in case len(spreadsheets) is wrong
 
 
-# In[19]:
+# In[ ]:
 
 
 cumulative_df = pd.DataFrame(spreadsheets)
@@ -290,20 +298,20 @@ cumulative_df = pd.DataFrame(spreadsheets)
 
 # ## Read separately 'virtus' annotations
 
-# In[20]:
+# In[ ]:
 
 
 virtus_paths = [f for f in os.listdir(os.path.join("..", "..", "virtus")) if f[-5:]=='.xlsx']
 print(virtus_paths)
 
 
-# In[21]:
+# In[ ]:
 
 
 virtus_spreadsheets = []
 
 
-# In[22]:
+# In[ ]:
 
 
 for path in virtus_paths:
@@ -401,24 +409,11 @@ for path in virtus_paths:
     pp.pprint(s)
     # ADD THIS WHOLE THING TO THE LIST OF DATA ON SPREADSHEETS
     virtus_spreadsheets.append(s)
-    # plot a heatmap of ratings
-    #df_ratings.fillna(value=np.nan, inplace=True)
-    #plt.clf()
-    #plt.figure(figsize=(10, 16))
-    #g = seabornInstance.heatmap(df_ratings, 
-    #                        cmap='Blues', 
-    #                        vmin=0, 
-    #                        #xticklabels=meanings_short,
-    #                        annot=True
-    #                       )
-    #g.set_xticklabels([textwrap.fill(e.replace('\xa0', ' '), 15, break_long_words=False) for e in df_ratings.columns], rotation =30)
-    #plt.title(s['word'] + ' : ' +s['annotator'])
-    #plt.savefig(s['word'] + ' : ' +s['annotator']+".png", bbox_inches='tight')
-    #plt.clf()
-    #plt.close()
 
 
-# In[23]:
+# ### Create a 'virtus' heatmap
+
+# In[ ]:
 
 
 temp = df_ratings
@@ -427,7 +422,7 @@ for s in virtus_spreadsheets[:-1]:
 temp
 
 
-# In[24]:
+# In[ ]:
 
 
 temp.fillna(value=np.nan, inplace=True)
@@ -447,37 +442,37 @@ plt.clf()
 plt.close()
 
 
-# In[25]:
+# In[ ]:
 
 
 virtus_df = pd.DataFrame(virtus_spreadsheets)
 
 
-# In[26]:
+# In[ ]:
 
 
-virtus_df.head()
+# virtus_df.head()
 
 
 # # Data analysis
 
-# ## Annotation styles
+# ## Annotation 'styles': grouping data by annotator
 
 # Dataframe columns: 'annotator', 'word', 'rows', 'meanings', 'number of meanings', 'cells', 'comments', 'number of comments', 'rating patterns', 'individual ratings frequency'<br>
 
-# In[27]:
+# In[ ]:
 
 
 ann_list = []
 
 
-# In[28]:
+# In[ ]:
 
 
 cumulative_df['annotator key'].unique()
 
 
-# In[29]:
+# In[ ]:
 
 
 for annotator in cumulative_df['annotator key'].unique():
@@ -487,7 +482,7 @@ for annotator in cumulative_df['annotator key'].unique():
     ann_df = cumulative_df[cumulative_df['annotator key'] == annotator]
     ann['words annotated'] = len(ann_df)
     ann['cells in total'] = sum(ann_df['cells'])
-    # calculate frequency of individual ratings
+# calculate frequency of individual ratings
     irf = pd.concat(ann_df['individual ratings frequency'].to_list(), ignore_index=True).iloc[:, :2]
     printsep('//')
     print(irf)
@@ -501,30 +496,25 @@ for annotator in cumulative_df['annotator key'].unique():
     ann["confidence"] = confidence
     print(irf)
     ann['individual rating frequency'] = irf
-    # and also store the freqs separately in a dict:
-    #ann['probabilities'] = dict(zip(irf['rating'], irf['frequency']))
-    #ann['patt_probability'] = annotator_probability(ann_df['number of meanings'].max(), ann['probabilities'])
-    # calculate individual patterns
+# calculate individual patterns
     prns = pd.concat(ann_df['rating patterns'].to_list(), ignore_index=True)
     prns = prns.groupby(['pattern'], as_index=False).sum()
     prns['frequency'] = prns['count'] / sum(prns['count'])
-    #prns['predicted_frequency'] = prns['pattern'].apply(lambda x: ann['patt_probability'][x])
     ann['patterns'] = prns
     print(prns)
-    # calculate sets of patterns
+# calculate sets of patterns
     prns['set'] = [str(set(ast.literal_eval(x))) for x in prns['pattern']]
     sets = prns.groupby(['set'], as_index=False).sum()
     ann['sets'] = sets
-    # append single annotator dictionary to a list of annotators
+# append single annotator dictionary to a list of annotators
     ann_list.append(ann)
     printsep('//')
 
 
-# Now we write all that to an excel spreadsheet (one per annotator)
-
-# In[29]:
+# In[ ]:
 
 
+# WRITE ANNOTATOR DATA TO .XLSX
 for a in ann_list:
     with pd.ExcelWriter(a['annotator'] +'_' + str(a['words annotated']) + '_words' '_style_export.xlsx') as writer:
         a['individual rating frequency'].to_excel(writer, sheet_name='individual rating frequency')
@@ -532,42 +522,37 @@ for a in ann_list:
         a['sets'].to_excel(writer, sheet_name='sets used')
 
 
-# In[30]:
+# In[ ]:
 
 
 ann_list
 
 
-# In[30]:
+# In[ ]:
 
 
-len(ann_list) #should be 7
+len(ann_list) # should be 7
 
 
-# now turn this list of a dictionaries into a dataframe
-
-# In[31]:
+# In[ ]:
 
 
+# CREATE ANNOTATION DATAFRAME
 annotation_styles = pd.DataFrame(ann_list)
-
-
-# ...and add the virtus confidences where possible
-
-# In[32]:
-
-
+# add virtus data if it exists
 annotation_styles.insert(3, 'confidence: virtus', virtus_df['confidence'])
 annotation_styles.insert(4, 'average: virtus', virtus_df['average'])
 
 
-# In[33]:
+# In[ ]:
 
 
 annotation_styles.iloc[:, :7]
 
 
-# In[35]:
+# ### Comparison plots: test task vs. annotation task
+
+# In[ ]:
 
 
 plt.close()
@@ -575,12 +560,13 @@ plt.clf()
 annotation_styles.plot.bar(figsize=(18,5), 
                            x='annotator', 
                            y=['confidence: virtus', 'confidence'],
-                          cmap='Set1')
+                          cmap='Set1',
+                          )
 filename = 'virtus-versus-task confidence.png'
-plt.savefig('confidence analysis/'+filename, bbox_inches='tight')
+plt.savefig('confidence analysis/'+filename, bbox_inches='tight',transparent=True)
 
 
-# In[36]:
+# In[ ]:
 
 
 plt.close()
@@ -590,16 +576,12 @@ annotation_styles.plot.bar(figsize=(18,5),
                            y=['average: virtus', 'average'],
                           cmap='Set2')
 filename = 'virtus-versus-task average.png'
-plt.savefig('confidence analysis/'+filename, bbox_inches='tight')
+plt.savefig('confidence analysis/'+filename, bbox_inches='tight', transparent=True)
 
 
-# In[37]:
+# ### Additional calculation: number of all possible patterns
 
-
-#cumulative_df
-
-
-# In[38]:
+# In[ ]:
 
 
 # counting the number of different patterns / number of possible combinations 
@@ -609,7 +591,7 @@ cumulative_df['count of all possible patterns'] = comb(5, cumulative_df['number 
 cumulative_df['% of possible pp used'] = cumulative_df['count of patterns'] / cumulative_df['count of all possible patterns']
 
 
-# In[39]:
+# In[ ]:
 
 
 for i in range(cumulative_df.shape[0]):
@@ -619,35 +601,30 @@ for i in range(cumulative_df.shape[0]):
     printsep('.')
 
 
-# # Dataframe of confidences
+# ### Dataframe of confidences
 
-# In[40]:
+# In[ ]:
 
 
 confidence_df = cumulative_df.loc[:, ['annotator key', 'word', 'number of meanings', 'confidence', 'average', 'count of patterns','count of all possible patterns', '% of possible pp used']]
 
 
-# In[41]:
+# In[ ]:
 
 
 annotators_meanings_conf = confidence_df[['annotator key', 'word', 'number of meanings', 'confidence', 'average']]
-
-
-# In[42]:
-
-
 annotators_meanings_conf
 
 
-# In[43]:
+# In[ ]:
 
 
 annotation_styles
 
 
-# ## Search for correlations between features of the annotated words and annotators' confidence
+# ### Analysis and weighting of the impact of the number of meanings on confidence
 
-# In[44]:
+# In[ ]:
 
 
 colors = {'A1': '#377eb8', 
@@ -676,7 +653,7 @@ markers = {'A1': 'o',
          } 
 
 
-# In[47]:
+# In[ ]:
 
 
 plt.clf()
@@ -688,30 +665,29 @@ for k in cumulative_df['annotator key'].unique():
              filename='confidence analysis/meanings_confidence_annotators.png', 
              a=1,
             c=colors[k],
-             m=markers[k],
-                 
+             m=markers[k], 
             )
 
 
-# In[51]:
+# In[ ]:
 
 
 grouped = cumulative_df.groupby(['number of meanings'])
 
 
-# In[52]:
+# In[ ]:
 
 
 n_of_meanings = cumulative_df['number of meanings'].unique()
 
 
-# In[53]:
+# In[ ]:
 
 
 meanings_and_patterns = {}
 
 
-# In[55]:
+# In[ ]:
 
 
 for i in range(2,8): 
@@ -719,14 +695,14 @@ for i in range(2,8):
     meanings_and_patterns[i] = pd.concat([m['annotator key'],m['word'],m['rating patterns'],m['individual ratings frequency']], axis=1)
 
 
-# In[56]:
+# In[ ]:
 
 
 confidence_meanings = {}
 average_meanings = {}
 
 
-# In[57]:
+# In[ ]:
 
 
 for key in meanings_and_patterns:
@@ -751,62 +727,44 @@ for key in meanings_and_patterns:
         prns.to_excel(writer, sheet_name='pattern frequency')
 
 
-# In[58]:
+# In[ ]:
 
 
 average_meanings
 
 
-# In[59]:
+# In[ ]:
 
 
+# the outlier 'jus' is taken out; confidence '6a' stores the value with the outlier
 confidence_meanings['6a']=confidence_meanings[6]
 
 
-# In[60]:
+# In[ ]:
 
 
-confidence_meanings[6]=0.563003 #average without 'jus'
-
-
-# In[61]:
-
-
+confidence_meanings[6]=0.563003 # average without 'jus'
 confidence_meanings
 
 
-# In[62]:
+# In[ ]:
 
 
 by_meanings = {}
 
-
-# In[63]:
-
-
 for key in average_meanings.keys():
     by_meanings[key]=[average_meanings[key], confidence_meanings[key]]
-
-
-# In[64]:
-
 
 df_by_meanings = pd.DataFrame(by_meanings, index=['meanings average', 'meanings confidence']).transpose()
 
 
-# In[65]:
+# In[ ]:
 
 
-df_by_meanings.loc[2, 'meanings confidence']
+df_by_meanings.loc[2, 'meanings confidence'] 
 
 
-# In[66]:
-
-
-df_by_meanings
-
-
-# In[67]:
+# In[ ]:
 
 
 plt.close()
@@ -815,138 +773,99 @@ df_by_meanings['meanings confidence'].plot(figsize=(18,5),
                                       x='number of meanings', 
                                       y='meanings confidence')
 filename = 'confidence by number of meanings_new6.png'
-plt.savefig(filename, bbox_inches='tight')
+plt.savefig(filename, bbox_inches='tight', transparent=True)
 
 
-# In[68]:
+# In[ ]:
 
 
 annotators_confidence = {dict["annotator"]:dict["confidence"] for dict in ann_list}
 
 
-# In[69]:
+# In[ ]:
 
 
 annotators_meanings_conf = pd.merge(annotators_meanings_conf, df_by_meanings, left_on='number of meanings', right_index=True)
 
 
-# In[70]:
+# In[ ]:
 
 
 annotators_meanings_conf.sort_index(inplace=True)
-
-
-# In[71]:
-
-
-annotators_meanings_conf
-
-
-# In[72]:
-
-
 annotators_meanings_conf.head()
 
 
-# In[73]:
+# In[ ]:
 
 
+# ADDING WEIGHTING COEFFICIENT
 k3 = 1
 annotators_meanings_conf['coefficient']=1/(annotators_meanings_conf['meanings confidence']/annotators_meanings_conf['meanings confidence'][0])
-
-
-# In[74]:
-
-
 annotators_meanings_conf['meanings confidence'][0]
-
-
-# In[75]:
-
-
 annotators_meanings_conf['weighted'] = annotators_meanings_conf['confidence'] * annotators_meanings_conf['coefficient']
 
 
-# In[76]:
+# In[ ]:
 
 
 virtus_coeff = float(annotators_meanings_conf.loc[annotators_meanings_conf['number of meanings']==6, ['coefficient']].iloc[0])
 
 
-# In[77]:
+# In[ ]:
 
 
 virtus_coeff
 
 
-# In[78]:
+# In[ ]:
 
 
 weighted_df = pd.DataFrame(index=annotators_confidence.keys())
 weighted_df['weighted confidence'] = np.nan
 
 
-# In[79]:
+# In[ ]:
 
 
 weighted_df
 
 
-# In[80]:
+# In[ ]:
 
 
 for annotator in annotators_confidence.keys():
-    print(annotator)
+    #print(annotator)
     annotator_df = annotators_meanings_conf[annotators_meanings_conf['annotator key'] == annotator]
-    print(annotator_df)
+    #print(annotator_df)
     weighted_confidence = annotator_df['weighted'].sum()/len(annotator_df)
-    print(weighted_confidence)
-    #annotation_styles['weighted confidence'] = weighted_confidence
+    #print(weighted_confidence)
     weighted_df.loc[[annotator], ['weighted confidence']] = weighted_confidence
-    #annotation_styles.plot.bar(figsize=(18,5),
-    
-#annotation_styles
 
 
-# In[81]:
+# In[ ]:
 
 
 weighted_df.reset_index(level=0, inplace=True)
 weighted_df = weighted_df.rename(columns={'index': 'annotator'})
 
 
-# In[82]:
+# In[ ]:
 
 
 weighted_df
 
 
-# In[83]:
+# In[ ]:
 
 
 annotation_styles = annotation_styles.merge(weighted_df, on='annotator')
-
-
-# In[84]:
-
-
 annotation_styles['weighted confidence: virtus'] = virtus_coeff * annotation_styles['confidence: virtus']
-
-
-# In[85]:
-
-
-#annotation_styles = annotation_styles.drop(columns=['weighted confidence_x'])
-#annotation_styles = annotation_styles.rename(columns={'weighted confidence_y':'weighted confidence'})
-
-
-# In[86]:
-
-
 annotation_styles[['annotator', 'words annotated', 'cells in total', 'confidence: virtus', 'weighted confidence: virtus', 'confidence', 'weighted confidence']]
 
 
-# In[87]:
+# #### Plots: annotators' confidence scores before and after weighting
+
+# In[ ]:
 
 
 plt.close()
@@ -960,10 +879,10 @@ annotation_styles.plot.bar(figsize=(18,5),
                                'weighted confidence',
                            ])
 filename = 'confidence analysis/virtus-average-vs-weighted-confidence_new6.png'
-plt.savefig(filename, bbox_inches='tight')
+plt.savefig(filename, bbox_inches='tight', transparent=True)
 
 
-# In[88]:
+# In[ ]:
 
 
 plt.close()
@@ -977,22 +896,18 @@ annotation_styles.plot.bar(figsize=(18,5),
                                'weighted confidence',
                            ])
 filename = 'confidence analysis/average-vs-weighted-confidence_new6.png'
-plt.savefig(filename, bbox_inches='tight')
+plt.savefig(filename, bbox_inches='tight',transparent=True)
 
 
-# In[89]:
-
-
-#annotators_meanings_conf.to_clipboard()
-
-
-# In[90]:
+# In[ ]:
 
 
 annotators_meanings_conf = annotators_meanings_conf.rename(columns={'weighted':'weighted confidence'})
 
 
-# In[94]:
+# #### Plots: scatter plots of all annotated words with weighted confidence values
+
+# In[ ]:
 
 
 plt.clf()
@@ -1004,18 +919,18 @@ for k in cumulative_df['annotator key'].unique():
              filename='confidence analysis/meanings_weighted confidence_words.png', 
              a=1,
             c=colors[k],
-             m=markers[k],                 
+             #m=markers[k],                 
             )
 
 
-# In[103]:
+# In[ ]:
 
 
 plt.clf()
 plt.rcParams['figure.figsize'] = [10, 10]
 fig = plt.figure()
 ax = fig.gca()
-for k in list(annotator_keys.values()):
+for k in cumulative_df['annotator key'].unique():
     plot_scatter(annotators_meanings_conf.loc[annotators_meanings_conf['annotator key']==k], 'number of meanings', 'weighted confidence', 'annotator key', 
              filename='scatter_plots/meanings_confidence_annotators_weighted.png', 
              a=1,
@@ -1025,65 +940,47 @@ for k in list(annotator_keys.values()):
             )
 
 
-# In[109]:
-
-
-'''
-ax =plt.subplots()
-for number in range(2,8):
-    print(number)
-    meanings_df = annotators_meanings_conf[annotators_meanings_conf['number of meanings'] == number]
-    print(meanings_df)
-    meanings_df[['confidence', 
-    'weighted']].plot(ax=ax, kind='box', title='comparison of non-weighted and weighted confidences for a word with {0} meanings'.format(number))
-    plt.savefig('weighed-confidences-boxplot-{0}.png'.format(number))
-    
-       #'number of meanings', 
-    #'confidence', 
-    #'weighted']].plot(
-    #subplots=True, 
-    #kind='box')
-'''
-
-
-# In[95]:
+# In[ ]:
 
 
 annotators_meanings_conf[['confidence', 
-    'weighted confidence']].plot(kind='box', title='comparison of non-weighted and weighted confidences')
+    'weighted confidence']].plot(kind='box', #title='comparison of non-weighted and weighted confidences'
+                                )
 plt.savefig('confidence analysis/weighed-confidences-boxplot-new6.png')
     
 
+
+# ## Adding new data to the annotation_styles dataframe
 
 # Now we have two values: 
 # - expected confidence of a specific annotator
 # - expected confidence for a word with N meanings
 
-# In[96]:
+# In[ ]:
 
 
 float(annotators_meanings_conf[annotators_meanings_conf['word']=='acerbus']['weighted confidence'])
 
 
-# In[97]:
+# In[ ]:
 
 
 annotation_styles.columns
 
 
-# In[98]:
+# In[ ]:
 
 
 confidence_df['expected confidence: annotator'] = confidence_df['annotator key'].apply(lambda x: annotators_confidence[x])
 
 
-# In[99]:
+# In[ ]:
 
 
 confidence_df['expected weighted confidence: annotator'] = confidence_df['annotator key'].apply(lambda x: float(annotation_styles[annotation_styles['annotator']==x]['weighted confidence']) )
 
 
-# In[100]:
+# In[ ]:
 
 
 confidence_df['virtus confidence: annotator'] = confidence_df['annotator key'].apply(
@@ -1092,7 +989,7 @@ confidence_df['virtus weighted confidence: annotator'] = confidence_df['annotato
     lambda x: annotation_styles.loc[annotation_styles['annotator']==x, 'weighted confidence: virtus'].values[0])
 
 
-# In[101]:
+# In[ ]:
 
 
 confidence_df['expected confidence: nr of meanings'] = confidence_df['number of meanings'].apply(lambda x: confidence_meanings[x])
@@ -1100,40 +997,43 @@ confidence_df['expected average: nr of meanings'] = confidence_df['number of mea
 confidence_df['weighted confidence'] = confidence_df['word'].apply(lambda x: float(annotators_meanings_conf[annotators_meanings_conf['word']==x]['weighted confidence']))
 
 
-# In[102]:
+# In[ ]:
 
 
 confidence_df['diff to annotator'] = confidence_df['expected confidence: annotator']-confidence_df['confidence']
 confidence_df['diff to meanings'] = confidence_df['expected confidence: nr of meanings']-confidence_df['confidence']
 
 
-# In[103]:
+# In[ ]:
 
 
 confidence_df
 
 
-# ## Comparison with semantic qualities of annotated words
+# ## Comparison of confidence and the semantic qualities of annotated words
 
-# In[106]:
+# In[ ]:
 
 
 words_data = read_excel(os.path.join("..", "..", 'Words_qualities.xlsx'), sheet_name=0, encoding='utf-8', dtype=object)
 
 
-# In[107]:
+# In[ ]:
 
 
 words_data
 
 
-# In[108]:
+# ### Comparison with the structure of the dictionary entry (Lewis and Short)
+# Data on the meanings was from L&S was collected manually and stored as a string (e.g. 'I, I.B.1, I.B.3, I.B.4, II'), in which each item corresponds to the position of the selected meaning within the hierarchy of the L&S entry for the words. 
+
+# In[ ]:
 
 
 lewis_and_short = words_data[['word','L&S hierarchy']]
 
 
-# In[109]:
+# In[ ]:
 
 
 class Node:
@@ -1157,7 +1057,7 @@ class Node:
     
 
 
-# In[110]:
+# In[ ]:
 
 
 def node_parser(tokens, parent_node): # tokens is a list
@@ -1189,14 +1089,14 @@ def hierarchy(string):
     return root
 
 
-# In[111]:
+# In[ ]:
 
 
 test_string = 'I, I.B.1, I.B.3, I.B.4, II'
 hierarchy(test_string)
 
 
-# In[112]:
+# In[ ]:
 
 
 def find_splits(node):
@@ -1220,115 +1120,117 @@ def tree_complexity(string):
     return find_splits(root)
 
 
-# In[113]:
+# In[ ]:
 
 
 print(tree_complexity(test_string))
 
 
-# In[114]:
+# In[ ]:
 
 
 test = tree_complexity('I, II.A, II.B, II.C.1, II.C.2.a, II.C.2.b, II.B.2')
 
 
-# In[115]:
+# In[ ]:
 
 
 words_data['L&S complexity'] = words_data['L&S hierarchy'].map(tree_complexity)
 
 
-# In[116]:
+# In[ ]:
 
 
 words_data
 
 
-# In[117]:
+# In[ ]:
 
 
 confidence_df = pd.merge(left=confidence_df, right=words_data, how='right', left_on=['word', 'number of meanings'], right_on=['word', 'number of meanings'])
 
 
-# In[118]:
+# In[ ]:
 
 
 print(confidence_df[confidence_df['word']=='jus']['expected confidence: nr of meanings'])
 
 
-# In[119]:
+# In[ ]:
 
 
 confidence_df.columns
 
 
-# In[120]:
+# In[ ]:
 
 
 confidence_df.to_excel('Confidence comparison_new6.xlsx')
 
 
-# In[121]:
+# In[ ]:
 
 
 confidence_df.head()
 
 
-# In[122]:
+# ### Visualisation of the relationship between confidence and suggested influencing quality for each words
+
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'weighted confidence', 'confidence', 'word')
 
 
-# In[123]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'expected weighted confidence: annotator', 'confidence', 'word')
 
 
-# In[124]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'sources (Fr)', 'confidence', 'word')
 
 
-# In[125]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, '% of possible pp used', 'confidence', 'word')
 
 
-# In[126]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'count of patterns', 'confidence', 'word')
 
 
-# In[127]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'count of patterns', 'average', 'word')
 
 
-# In[128]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'L&S complexity', 'confidence', 'word')
 
 
-# In[129]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'L&S complexity', 'number of meanings', 'word')
 
 
-# In[130]:
+# In[ ]:
 
 
 plot_scatter(confidence_df, 'POS', 'confidence', None)
 
 
-# In[148]:
+# In[ ]:
 
 
 #ax = confidence_df.plot.scatter(x='confidence', y='word', color='blue', label='real confidence')
@@ -1336,7 +1238,7 @@ plot_scatter(confidence_df, 'POS', 'confidence', None)
 #confidence_df.plot.scatter(x='expected confidence: nr of meanings', y='word', color='cyan', ax=ax, label='meanings confidence', )
 
 
-# In[131]:
+# In[ ]:
 
 
 '''
@@ -1350,7 +1252,7 @@ plt.axhline()
 '''
 
 
-# In[132]:
+# In[ ]:
 
 
 '''
@@ -1365,7 +1267,7 @@ plt.savefig('words_confidences_target_or_control.png', bbox_inches='tight')
 '''
 
 
-# In[133]:
+# In[ ]:
 
 
 '''
@@ -1380,7 +1282,7 @@ plt.savefig('words_confidences_target_or_control_weighted.png', bbox_inches='tig
 '''
 
 
-# In[152]:
+# In[ ]:
 
 
 plt.rcParams['figure.figsize'] = [20, 4]
@@ -1396,7 +1298,7 @@ plt.axhline()
 plt.savefig('confidence analysis/words_confidences_all_weighted.png', bbox_inches='tight')
 
 
-# In[153]:
+# In[ ]:
 
 
 plt.rcParams['figure.figsize'] = [20, 4]
@@ -1412,7 +1314,7 @@ plt.axhline()
 plt.savefig('confidence analysis/words_confidences_all_notweighted.png', bbox_inches='tight')
 
 
-# In[154]:
+# In[ ]:
 
 
 plt.rcParams['figure.figsize'] = [20, 4]
@@ -1430,15 +1332,14 @@ plt.savefig('confidence analysis/words_averages_all.png', bbox_inches='tight')
 
 # ## Plotting single words
 
-# > single_words is a dictionary of dataframes containing cleaned up annotation data for every word in the task
-
-# In[134]:
+# In[ ]:
 
 
+# single_words is a dictionary of dataframes containing cleaned up annotation data for every word in the task
 single_words
 
 
-# In[135]:
+# In[ ]:
 
 
 def context_confidence(row):
@@ -1456,7 +1357,7 @@ def context_confidence(row):
         return(0)
 
 
-# In[136]:
+# In[ ]:
 
 
 def context_average(row):
@@ -1474,13 +1375,13 @@ def context_average(row):
         return(0)
 
 
-# In[137]:
+# In[ ]:
 
 
 confidence_df.head()
 
 
-# In[138]:
+# In[ ]:
 
 
 def single_word_analysis(analysed_word):    
@@ -1498,7 +1399,7 @@ def single_word_analysis(analysed_word):
     plt.clf()
 
 
-# In[383]:
+# In[ ]:
 
 
 def single_word_diachronic_plot(analysed_word):
@@ -1517,7 +1418,7 @@ def single_word_diachronic_plot(analysed_word):
     plt.clf()
 
 
-# In[385]:
+# In[ ]:
 
 
 def single_word_diachronic_plot_unstacked(analysed_word):
@@ -1536,59 +1437,59 @@ def single_word_diachronic_plot_unstacked(analysed_word):
     plt.clf()
 
 
-# In[384]:
+# In[ ]:
 
 
 for word in single_words.keys():
     single_word_diachronic_plot(word)
 
 
-# In[386]:
+# In[ ]:
 
 
 for word in single_words.keys():
     single_word_diachronic_plot_unstacked(word)
 
 
-# In[382]:
+# In[ ]:
 
 
 for word in single_words.keys():
     single_word_analysis(word)
 
 
+# # Linear regression models
+
 # ## Looking for explanations of confidence
 
-# In[145]:
+# In[ ]:
 
 
 pl = confidence_df.plot.scatter(x='confidence', y='expected confidence: nr of meanings', figsize=[7,7])
 pl.plot([0, 1], [0, 1])
 
 
-# In[146]:
+# In[ ]:
 
 
 pl = confidence_df.plot.scatter(x='confidence', y='expected confidence: annotator', figsize=[7,7])
 pl.plot([0, 1], [0, 1])
 
 
-# In[147]:
+# In[ ]:
 
 
 pl = confidence_df.plot.scatter(x='expected confidence: nr of meanings', y='expected confidence: annotator', figsize=[7,7])
 pl.plot([0,2, 1,2], [0,2, 1,2])
 
 
-# # Linear regression models
-
-# In[148]:
+# In[ ]:
 
 
 confidence_df
 
 
-# In[149]:
+# In[ ]:
 
 
 models_results = []
@@ -1596,69 +1497,69 @@ models_results = []
 
 # ## Model #1: based on expected confidences
 
-# In[150]:
+# In[ ]:
 
 
 model = '#1'
 predictors = ['expected confidence: annotator', 'expected confidence: nr of meanings']
 
 
-# In[151]:
+# In[ ]:
 
 
 X = confidence_df[predictors].values
 
 
-# In[152]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[153]:
+# In[ ]:
 
 
 seabornInstance.distplot(confidence_df['confidence'])
 
 
-# In[154]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[155]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[156]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[157]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[158]:
+# In[ ]:
 
 
 y_test
 
 
-# In[159]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[160]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -1666,13 +1567,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[161]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean()
 
 
-# In[162]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -1682,31 +1583,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[163]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[164]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[165]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[166]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[167]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -1724,81 +1625,81 @@ models_results.append({
 
 # ## Model #1.a: based on expected annotator & meanings confidences +  virtus confidences (only for the 4 annotators who annotated virtus)
 
-# In[168]:
+# In[ ]:
 
 
 model = '#1.a'
 predictors = ['virtus confidence: annotator', 'expected confidence: annotator', 'expected confidence: nr of meanings']
 
 
-# In[169]:
+# In[ ]:
 
 
 X = confidence_df[predictors].dropna().values
 
 
-# In[170]:
+# In[ ]:
 
 
 y = confidence_df[['virtus confidence: annotator', 'expected confidence: annotator', 'expected confidence: nr of meanings', 'confidence']].dropna().values
 
 
-# In[171]:
+# In[ ]:
 
 
 len(y)
 
 
-# In[172]:
+# In[ ]:
 
 
 seabornInstance.distplot(confidence_df[['virtus confidence: annotator', 'expected confidence: annotator', 'expected confidence: nr of meanings', 'confidence']].dropna()['confidence'])
 
 
-# In[173]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[174]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[175]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[176]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[177]:
+# In[ ]:
 
 
 y_pred[:, 0]
 
 
-# In[178]:
+# In[ ]:
 
 
 y_test
 
 
-# In[179]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[180]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -1806,13 +1707,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[181]:
+# In[ ]:
 
 
 confidence_df.dropna()['confidence'].mean()
 
 
-# In[182]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -1822,31 +1723,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared 
 
-# In[183]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[184]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[185]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[186]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[187]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -1865,38 +1766,38 @@ models_results.append({
 # ## Model #1.b: based only on number of meanings +  virtus confidences 
 # (only for the 4 annotators who did virtus)
 
-# In[188]:
+# In[ ]:
 
 
 model = '#1.b'
 predictors = ['number of meanings', 'virtus confidence: annotator']
 
 
-# In[189]:
+# In[ ]:
 
 
 X = confidence_df[predictors].dropna().values
 
 
-# In[190]:
+# In[ ]:
 
 
 y = confidence_df.dropna()['confidence'].values
 
 
-# In[191]:
+# In[ ]:
 
 
 len(X) == len(y)
 
 
-# In[192]:
+# In[ ]:
 
 
 seabornInstance.distplot(confidence_df.dropna()['confidence'])
 
 
-# In[193]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
@@ -1909,31 +1810,31 @@ regressor = LinearRegression()
 regressor.fit(X_train, y_train)
 
 
-# In[194]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[195]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[196]:
+# In[ ]:
 
 
 y_test
 
 
-# In[197]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[198]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -1941,13 +1842,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[199]:
+# In[ ]:
 
 
 confidence_df.dropna()['confidence'].mean()
 
 
-# In[200]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -1957,31 +1858,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better 
 
-# In[201]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[202]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[204]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[205]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[206]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2000,38 +1901,38 @@ models_results.append({
 # ## Model #1.c: based on number of meanings +  virtus confidences + count of patterns
 # (only for the 4 annotators who did virtus)
 
-# In[207]:
+# In[ ]:
 
 
 model = '#1.c'
 predictors = ['number of meanings', 'virtus confidence: annotator', 'count of patterns']
 
 
-# In[208]:
+# In[ ]:
 
 
 X = confidence_df[predictors].dropna().values
 
 
-# In[209]:
+# In[ ]:
 
 
 y = confidence_df.dropna()['confidence'].values
 
 
-# In[210]:
+# In[ ]:
 
 
 len(X) == len(y)
 
 
-# In[211]:
+# In[ ]:
 
 
 seabornInstance.distplot(confidence_df.dropna()['confidence'])
 
 
-# In[212]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
@@ -2044,31 +1945,31 @@ regressor = LinearRegression()
 regressor.fit(X_train, y_train)
 
 
-# In[213]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[214]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[215]:
+# In[ ]:
 
 
 y_test
 
 
-# In[216]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[217]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2076,13 +1977,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[218]:
+# In[ ]:
 
 
 confidence_df.dropna()['confidence'].mean()
 
 
-# In[219]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2092,31 +1993,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[220]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[221]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[222]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[223]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[224]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2134,70 +2035,70 @@ models_results.append({
 
 # ## Model #2: based on (1) annotator confidence; (2) number of meanings 
 
-# In[225]:
+# In[ ]:
 
 
 model = '#2'
 predictors = ['expected confidence: annotator', 'number of meanings']
 
 
-# In[226]:
+# In[ ]:
 
 
 X = confidence_df[predictors].values
 #X = confidence_df['expected confidence: annotator'].values.reshape(-1,1)
 
 
-# In[227]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[228]:
+# In[ ]:
 
 
 seabornInstance.distplot(confidence_df['confidence'])
 
 
-# In[229]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[230]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[231]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[232]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[233]:
+# In[ ]:
 
 
 y_test
 
 
-# In[234]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[235]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2205,13 +2106,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[236]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean()
 
 
-# In[237]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2221,13 +2122,13 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[238]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[239]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2245,93 +2146,93 @@ models_results.append({
 
 # # Model #3: Based on annotator and number of meanings
 
-# In[240]:
+# In[ ]:
 
 
 model = '#3'
 predictors = ['annotator', 'number of meanings']
 
 
-# In[252]:
+# In[ ]:
 
 
 annotators = pd.get_dummies(cumulative_df['annotator key'])
 
 
-# In[253]:
+# In[ ]:
 
 
 annotators
 
 
-# In[254]:
+# In[ ]:
 
 
 train = pd.concat([cumulative_df, annotators], axis=1)
 
 
-# In[255]:
+# In[ ]:
 
 
 train
 
 
-# In[256]:
+# In[ ]:
 
 
 X = train[['A1', 'A2', 'A7', 'A6', 'A3', 'A5', 'A4']].values
 
 
-# In[257]:
+# In[ ]:
 
 
 y = train['confidence'].values
 
 
-# In[258]:
+# In[ ]:
 
 
 y
 
 
-# In[259]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[260]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[261]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[262]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[263]:
+# In[ ]:
 
 
 y_test
 
 
-# In[264]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[265]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2339,13 +2240,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[266]:
+# In[ ]:
 
 
 train['confidence'].mean()
 
 
-# In[267]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2355,13 +2256,13 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[268]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[269]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2382,69 +2283,69 @@ models_results.append({
 # # Model #4: based on (1) count of patterns and (2) number of meanings
 # **< Spoiler: the best R-squared so far >**
 
-# In[270]:
+# In[ ]:
 
 
 model = '#4'
 predictors = ['count of patterns', 'number of meanings']
 
 
-# In[271]:
+# In[ ]:
 
 
 X = confidence_df[predictors].values
 
 
-# In[272]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[273]:
+# In[ ]:
 
 
 seabornInstance.distplot(confidence_df['confidence'])
 
 
-# In[274]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[275]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[276]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[277]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[278]:
+# In[ ]:
 
 
 y_test
 
 
-# In[279]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[280]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2452,13 +2353,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[281]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean()
 
 
-# In[282]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2468,31 +2369,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[283]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[284]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[285]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[286]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[287]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2512,63 +2413,63 @@ models_results.append({
 # 
 # _*NB* the way of counting meaning clusters should be improved_
 
-# In[288]:
+# In[ ]:
 
 
 model = '#5'
 predictors = ['count of patterns', 'meaning clusters']
 
 
-# In[289]:
+# In[ ]:
 
 
 X = confidence_df[['count of patterns', 'meaning clusters (D)']].values
 
 
-# In[290]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[291]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[292]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[293]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[294]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[295]:
+# In[ ]:
 
 
 y_test
 
 
-# In[296]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[297]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2576,13 +2477,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[298]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean()
 
 
-# In[299]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2592,31 +2493,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[300]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[301]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[302]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[303]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[304]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2637,69 +2538,69 @@ models_results.append({
 
 # # Model #6: based on (1) number of sources and (2) count of patterns
 
-# In[305]:
+# In[ ]:
 
 
 model = '#6'
 predictors = ['count of patterns', 'sources (Fr)']
 
 
-# In[306]:
+# In[ ]:
 
 
 confidence_df.columns
 
 
-# In[307]:
+# In[ ]:
 
 
 X = confidence_df[['count of patterns', 'sources (Fr)']].values
 
 
-# In[308]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[309]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
-# In[310]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[311]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[312]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[313]:
+# In[ ]:
 
 
 y_test
 
 
-# In[314]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[315]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2707,13 +2608,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[316]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean() # mean confidence value = 0.6191 >> MAE should be not greater than 0.06
 
 
-# In[317]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2723,31 +2624,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[318]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[319]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[320]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[321]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[322]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2766,69 +2667,69 @@ models_results.append({
 
 # # Model #6a: based on number of meanings and complexity
 
-# In[323]:
+# In[ ]:
 
 
 model = '#6a'
 predictors = ['sources (Fr)', 'L&S complexity']
 
 
-# In[324]:
+# In[ ]:
 
 
 confidence_df.columns
 
 
-# In[325]:
+# In[ ]:
 
 
 X = confidence_df[['number of meanings', 'L&S complexity']].values
 
 
-# In[326]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[327]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[328]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[329]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[330]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[331]:
+# In[ ]:
 
 
 y_test
 
 
-# In[332]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[333]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2836,13 +2737,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[334]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean() # mean confidence value = 0.6094 >> MAE should be not greater than 0.06
 
 
-# In[335]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2852,31 +2753,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[336]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[337]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[338]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[339]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[340]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -2893,77 +2794,71 @@ models_results.append({
 })
 
 
-# In[ ]:
-
-
-
-
-
 # # Model #7: based on (1) number of sources and (2) number of meanings
 
-# In[341]:
+# In[ ]:
 
 
 model = '#7'
 predictors = ['number of meanings', 'sources (Fr)']
 
 
-# In[342]:
+# In[ ]:
 
 
 confidence_df.columns
 
 
-# In[343]:
+# In[ ]:
 
 
 X = confidence_df[['number of meanings', 'sources (Fr)']].values
 
 
-# In[344]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[345]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[346]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[347]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[348]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[349]:
+# In[ ]:
 
 
 y_test
 
 
-# In[350]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[351]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -2971,13 +2866,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[352]:
+# In[ ]:
 
 
 new_conf_df['confidence'].mean() # mean confidence value = 0.6191 >> MAE should be not greater than 0.06
 
 
-# In[353]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -2987,31 +2882,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[354]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[355]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[356]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[357]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[358]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -3030,69 +2925,69 @@ models_results.append({
 
 # # Model #8: based on (1) number of sources and (2) expected confidence: meanings
 
-# In[359]:
+# In[ ]:
 
 
 model = '#8'
 predictors = ['expected confidence: nr of meanings', 'sources (Fr)']
 
 
-# In[360]:
+# In[ ]:
 
 
 confidence_df.columns
 
 
-# In[361]:
+# In[ ]:
 
 
 X = confidence_df[['expected confidence: nr of meanings', 'sources (Fr)']].values
 
 
-# In[362]:
+# In[ ]:
 
 
 y = confidence_df['confidence'].values
 
 
-# In[363]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
-# In[364]:
+# In[ ]:
 
 
 regressor = LinearRegression()  
 regressor.fit(X_train, y_train)
 
 
-# In[365]:
+# In[ ]:
 
 
 y_pred = regressor.predict(X_test)
 
 
-# In[366]:
+# In[ ]:
 
 
 y_pred
 
 
-# In[367]:
+# In[ ]:
 
 
 y_test
 
 
-# In[368]:
+# In[ ]:
 
 
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}, index=range(len(y_test)))
 
 
-# In[369]:
+# In[ ]:
 
 
 df.plot(kind='bar')
@@ -3100,13 +2995,13 @@ df.plot(kind='bar')
 
 # ### Test 1: Mean absolute error should be within the 10% range of the mean confidence value.
 
-# In[370]:
+# In[ ]:
 
 
 confidence_df['confidence'].mean() # mean confidence value = 0.6191 >> MAE should be not greater than 0.06
 
 
-# In[371]:
+# In[ ]:
 
 
 print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  
@@ -3116,31 +3011,31 @@ print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_p
 
 # ### Test 2: R squared is in the interval (0, 1), the greater the better
 
-# In[372]:
+# In[ ]:
 
 
 metrics.r2_score(y_test, y_pred)
 
 
-# In[373]:
+# In[ ]:
 
 
 metrics.explained_variance_score(y_test, y_pred) # maximum value is 1 and is desirable
 
 
-# In[374]:
+# In[ ]:
 
 
 metrics.max_error(y_test, y_pred) 
 
 
-# In[375]:
+# In[ ]:
 
 
 metrics.median_absolute_error(y_test, y_pred)
 
 
-# In[376]:
+# In[ ]:
 
 
 # add result to a dictionary
@@ -3157,33 +3052,33 @@ models_results.append({
 })
 
 
-# # Model performance comparison
+# ## Model performance comparison
 
-# In[377]:
+# In[ ]:
 
 
 pp.pprint(models_results)
 
 
-# In[378]:
+# In[ ]:
 
 
 model_performance = pd.DataFrame(models_results)
 
 
-# In[379]:
+# In[ ]:
 
 
 model_performance
 
 
-# In[380]:
+# In[ ]:
 
 
 model_performance.to_clipboard()
 
 
-# In[381]:
+# In[ ]:
 
 
 annotation_styles.iloc[:,:5].to_clipboard()
