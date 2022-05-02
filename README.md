@@ -5,7 +5,7 @@ Code for analysing the semantic annotation of Latin data from SemEval 2020 task 
 
 `diachronic_analysis.py` (developed by Barbara McGillivray): analyses the association between new senses of target words and CE texts.
 
-`confidence_analysis.py` (developed by Daria Kondakova): analyses factors influencing the annotation confidence.
+`annotation_analysis.py` (developed by Daria Kondakova): analyses factors influencing the annotation confidence and the annotation results for individual words.
 
 ## Confidence analysis
 
@@ -15,7 +15,7 @@ The results of the first part of the analysis are presented in the form of sprea
 
 Folders [heatmaps](https://github.com/alan-turing-institute/latin_annotation/tree/master/heatmaps) and [words visualised](https://github.com/alan-turing-institute/latin_annotation/tree/master/words%20visualised) contain the visualisation of the annotation data on the level of an individual word. More information on the specific visualisations can be found in the respective folders. 
 
-The commented code can be viewed in the Jupyter notebook `confidence_analysis.ipynb`. 
+The commented code can be viewed in the Jupyter notebook `annotation_analysis.ipynb`. 
 
 ## Vagueness score
 Code to calculate the vagueness score of each word and related plots is contained in the folder [vagueness](https://github.com/alan-turing-institute/latin_annotation/tree/master/vagueness). The folder contains additional documentation.
